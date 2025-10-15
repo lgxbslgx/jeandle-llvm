@@ -2,6 +2,7 @@ name: "jeandle-llvm check"
 
 on:
   pull_request_target:
+    types: [ opened, synchronize, reopened, labeled, unlabeled ]
     branches:
       - 'main'
   workflow_dispatch:
@@ -15,6 +16,7 @@ jobs:
   test:
     name: "jeandle-llvm test"
     runs-on: ${{ matrix.runs-on }}
+    if: ${{ matrix.switch }}
 
     strategy:
       matrix:
@@ -22,9 +24,15 @@ jobs:
           - arch: x64
             target: X86
             runs-on: ubuntu-22.04
+            switch: true
           - arch: aarch64
             target: AArch64
             runs-on: ubuntu-22.04-arm
+            switch: ${{ contains(github.event.pull_request.labels.*.name, 'AArch64') }}
+          - arch: riscv64
+            target: RISCV
+            runs-on: riscv-builders
+            switch: ${{ contains(github.event.pull_request.labels.*.name, 'RISC-V') }}
 
     steps:
       - name: 'checkout the source code'
@@ -57,3 +65,9 @@ jobs:
           git fetch --depth=1 jeandle-main
           sudo apt-get install -y clang-format
           git clang-format jeandle-main/main
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Format check failed!"
+            exit 1
+          else
+            exit 0
+          fi
