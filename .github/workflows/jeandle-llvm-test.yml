@@ -15,7 +15,6 @@ jobs:
   test:
     name: "jeandle-llvm test"
     runs-on: ${{ matrix.runs-on }}
-    if: ${{ matrix.switch }}
 
     strategy:
       matrix:
@@ -36,12 +35,14 @@ jobs:
     steps:
       - name: 'checkout the source code'
         uses: actions/checkout@v4
+        if: ${{ matrix.switch }}
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 1
 
       - name: build and test
+        if: ${{ matrix.switch }}
         run : |
           mkdir build
           cd build
