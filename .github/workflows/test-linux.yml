@@ -13,7 +13,7 @@ on:
 jobs:
   test:
     name: test
-    runs-on: ${{ fromJson(inputs.runs-on) }}
+    runs-on: ${{ inputs.runs-on }}
 
     steps:
       - name: 'checkout the source code'

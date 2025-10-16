@@ -15,21 +15,21 @@ jobs:
     name: linux-x64
     uses: ./.github/workflows/test-linux.yml
     with:
-      runs-on: '["ubuntu-22.04"]'
+      runs-on: ubuntu-22.04
       target: X86
 
   test-linux-aarch64:
     name: linux-aarch64
     uses: ./.github/workflows/test-linux.yml
     with:
-      runs-on: '["ubuntu-22.04-arm"]'
+      runs-on: ubuntu-22.04-arm
       target: AArch64
     if: ${{ contains(github.event.pull_request.labels.*.name, 'AArch64') }}
 
   test-linux-riscv64:
     uses: ./.github/workflows/test-linux.yml
     with:
-      runs-on: '["riscv-builders", "soc-starfive-jh7100"]'
+      runs-on: riscv-builders
       target: RISCV
     if: ${{ contains(github.event.pull_request.labels.*.name, 'RISC-V') }}
 
