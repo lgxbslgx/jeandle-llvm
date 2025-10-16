@@ -27,6 +27,7 @@ jobs:
     if: ${{ contains(github.event.pull_request.labels.*.name, 'AArch64') }}
 
   test-linux-riscv64:
+    name: linux-riscv64
     uses: ./.github/workflows/test-linux.yml
     with:
       runs-on: riscv-builders
