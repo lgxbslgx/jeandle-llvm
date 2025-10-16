@@ -11,43 +11,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test-linux-x64:
+    name: linux-x64
+    uses: ./.github/workflows/test-linux.yml
+    with:
+      runs-on: ubuntu-22.04
+      target: X86
 
-  test:
-    name: "jeandle-llvm test"
-    runs-on: ${{ matrix.runs-on }}
+  test-linux-aarch64:
+    name: linux-aarch64
+    uses: ./.github/workflows/test-linux.yml
+    with:
+      runs-on: ubuntu-22.04-arm
+      target: AArch64
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'AArch64') }}
 
-    strategy:
-      matrix:
-        include:
-          - arch: x64
-            target: X86
-            runs-on: ubuntu-22.04
-            switch: true
-          - arch: aarch64
-            target: AArch64
-            runs-on: ubuntu-22.04-arm
-            switch: ${{ contains(github.event.pull_request.labels.*.name, 'AArch64') }}
-          - arch: riscv64
-            target: RISCV
-            runs-on: riscv-builders
-            switch: ${{ contains(github.event.pull_request.labels.*.name, 'RISC-V') }}
-
-    steps:
-      - name: 'checkout the source code'
-        uses: actions/checkout@v4
-        if: ${{ matrix.switch }}
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 1
-
-      - name: build and test
-        if: ${{ matrix.switch }}
-        run : |
-          mkdir build
-          cd build
-          cmake -G "Unix Makefiles" -DLLVM_TARGETS_TO_BUILD=${{ matrix.target }} -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=ON -DLLVM_BUILD_LLVM_DYLIB=ON -DLLVM_DYLIB_COMPONENTS=all ../llvm
-          make check-llvm -j $[$(nproc)/2]
+  test-linux-riscv64:
+    uses: ./.github/workflows/test-linux.yml
+    with:
+      runs-on: riscv-builders
+      target: RISCV
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'RISC-V') }}
 
   clang-format:
     name: "clang-format check"
