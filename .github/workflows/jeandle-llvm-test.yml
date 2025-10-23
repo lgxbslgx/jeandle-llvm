@@ -30,7 +30,7 @@ jobs:
     name: linux-riscv64
     uses: ./.github/workflows/test-linux.yml
     with:
-      runs-on: riscv-builders
+      runs-on: ubuntu-22.04
       target: RISCV
     if: ${{ contains(github.event.pull_request.labels.*.name, 'RISC-V') }}
 
