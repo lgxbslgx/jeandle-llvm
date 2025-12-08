@@ -732,6 +732,12 @@ static void AttemptToFoldSymbolOffsetDifference(
                  !Asm->getBackend().shouldInsertExtraNopBytesForCodeAlign(
                      *AF, Count)) {
         Displacement += Asm->computeFragmentSize(*AF);
+      } else if (auto *RF = dyn_cast<MCRelaxableFragment>(FI);
+                 RF && Asm->hasFinalLayout()) {
+        // Before finishLayout, a relaxable fragment's size is indeterminate.
+        // After layout, during relocation generation, it can be treated as a
+        // data fragment.
+        Displacement += RF->getContents().size();
       } else if (auto *FF = dyn_cast<MCFillFragment>(FI);
                  FF && FF->getNumValues().evaluateAsAbsolute(Num)) {
         Displacement += Num * FF->getValueSize();
